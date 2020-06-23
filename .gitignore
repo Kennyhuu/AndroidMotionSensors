@@ -25,3 +25,7 @@ hs_err_pid*
 /android_app/.gradle/
 /android_app/.idea/
 /desktop_app/paho*
+/android_app/app/gradle/wrapper/
+/android_app/app/gradlew
+/android_app/app/gradlew.bat
+/android_app/app/local.properties
