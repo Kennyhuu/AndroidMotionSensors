@@ -31,3 +31,5 @@ hs_err_pid*
 /android_app/app/local.properties
 /android_app/.gradle/
 /android_app/.idea/
+/android_app/build/
+/android_app/AndroidMotionSensors.iml
