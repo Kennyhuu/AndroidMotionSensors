@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DataPoint[] getDataPoint() {
         return new DataPoint[]{
-                new DataPoint(0,0)
+        new DataPoint(0,0)
         };
     }
 
