@@ -1,10 +1,13 @@
 package framework;
 
+import server.Server;
+
 public class Application {
 
 	public static void main(String[] args) {
-		GUI gui = new GUI();
+		GUI gui = new framework.GUI();
 		gui.setup();
+
 	}
 
 }

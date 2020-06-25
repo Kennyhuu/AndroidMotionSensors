@@ -9,8 +9,9 @@ public class Server {
 		userinterface=ui;
 		emergencyservice=es;
 		userconnection = new UserConnection(dataOb, new DataProcessor(this));
+		start();
 	}
-	
+
 	public void start(){
 		userconnection.start();
 	}

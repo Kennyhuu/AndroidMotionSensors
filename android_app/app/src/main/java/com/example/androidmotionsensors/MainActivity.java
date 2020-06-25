@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void doMqttPublish(String payload){
         if(isMqttstarted() == true){
-            String topic = "iot_data";
+            String topic = "phone/Gyros";
             //String payload = "the payload";
             byte[] encodedPayload;
             try {

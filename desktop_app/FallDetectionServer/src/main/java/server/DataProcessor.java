@@ -2,14 +2,14 @@ package server;
 
 import java.util.ArrayList;
 
-class DataProcessor {
+public class DataProcessor {
 	
 	private Server server;
 	private ArrayList<MovementData> dataList;
 	
 	protected DataProcessor(Server s){
 		server=s;
-		dataList = new ArrayList<>();
+		dataList = new ArrayList<MovementData>();
 	}
 	
 	protected void calc(MovementData newData){

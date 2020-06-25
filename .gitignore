@@ -43,3 +43,7 @@ hs_err_pid*
 /android_app/.idea/workspace.xml
 /android_app/AndroidMotionSensors.iml
 /android_app/app/app.iml
+/desktop_app/FallDetectionServer/paho*
+/android_app/.gradle/
+/android_app/.idea/
+/desktop_app/FallDetectionServer/.gradle
