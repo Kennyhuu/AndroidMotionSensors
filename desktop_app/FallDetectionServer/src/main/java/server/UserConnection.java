@@ -15,8 +15,4 @@ class UserConnection {
 		observer=dataOb;
 		processor=dp;
 	}
-	
-	protected void start(){
-		
-	}
 }

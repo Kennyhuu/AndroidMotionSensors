@@ -7,20 +7,23 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.ListSelectionModel;
 
 import server.DataObserver;
@@ -106,7 +109,7 @@ public class GUI implements DataObserver, UserInterface, EmergencyService{
 				newData(new MovementData((rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f));
 			}
 		}, (long)20,(long)20);*/
-		System.out.println(checkUser());
+		callHelp();
 	}
 	
 	private void setup_multiple_connection()
@@ -175,13 +178,16 @@ public class GUI implements DataObserver, UserInterface, EmergencyService{
 
 	@Override
 	public boolean callHelp() {
-		
+		JOptionPane.showMessageDialog(new JFrame(),
+			    "We should call the ambulance.",
+			    "Emergency situation",
+			    JOptionPane.WARNING_MESSAGE);
 		return true;
 	}
 
 	@Override
 	public boolean checkUser() {
-		/*Object[] options = {"Yes, I am fine","No, I need help"};
+		Object[] options = {"Yes, I am fine","No, I need help"};
 		JOptionPane pane = new JOptionPane(
 			    "We detected a possible accident.\nIs everything all right?",
 			    JOptionPane.QUESTION_MESSAGE,
@@ -189,15 +195,29 @@ public class GUI implements DataObserver, UserInterface, EmergencyService{
 			    null,
 			    options,
 			    null);
-		JFrame frame = new JFrame();
-		frame.add(pane);
-		frame.pack();
-		frame.setVisible(true);
-		int n = ((Integer)pane.getValue()).intValue();
-		System.out.println();
-		System.out.println(n);
-		return n==JOptionPane.YES_OPTION;*/
-		return true;
+		JDialog dlg = pane.createDialog("Falling detected");
+		dlg.setAlwaysOnTop(true);
+	    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+	    dlg.addComponentListener(new ComponentAdapter() {
+	        @Override
+	        public void componentShown(ComponentEvent e) {
+	            super.componentShown(e);
+	            Timer t = new Timer(1000 * 10, new ActionListener() {
+	                @Override
+	                public void actionPerformed(ActionEvent e) {
+	                    dlg.setVisible(false);
+	                }
+
+	            });
+	            t.start();
+	        }
+	    });
+	    dlg.setVisible(true);
+	    
+	    Object selectedvalue = pane.getValue();
+	    if (selectedvalue.equals(options[0]))
+	        return true;
+	    return false;
 	}
 	
 }

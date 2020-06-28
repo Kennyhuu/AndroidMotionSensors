@@ -11,9 +11,9 @@ public class Server {
 		userconnection = new UserConnection(dataOb, new DataProcessor(this));
 	}
 	
-	public void start(){
+	/*public void start(){
 		userconnection.start();
-	}
+	}*/
 	
 	protected void emergency(){
 		boolean userOK = userinterface.checkUser();
