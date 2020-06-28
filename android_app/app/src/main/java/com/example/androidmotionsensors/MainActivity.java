@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DataPoint[] getDataPoint() {
         return new DataPoint[]{
-                new DataPoint(0,0)
+        new DataPoint(0,0)
         };
     }
 
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void doMqttPublish(String payload){
         if(isMqttstarted() == true){
-            String topic = "iot_data";
+            String topic = "phone/Gyros";
             //String payload = "the payload";
             byte[] encodedPayload;
             try {

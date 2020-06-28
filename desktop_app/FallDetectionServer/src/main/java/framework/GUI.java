@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -20,19 +21,17 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.ListSelectionModel;
-
 import server.DataObserver;
 import server.EmergencyService;
 import server.MovementData;
 import server.Server;
 import server.UserInterface;
 
-public class GUI implements DataObserver, UserInterface, EmergencyService{
+public class GUI implements DataObserver, UserInterface, EmergencyService {
 
 	private final boolean multipleConn = false;
 	private LinkedList<MovementData> dataList;
