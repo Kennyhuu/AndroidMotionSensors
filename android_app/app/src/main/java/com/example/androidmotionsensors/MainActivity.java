@@ -20,6 +20,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,26 +41,26 @@ public class MainActivity extends AppCompatActivity {
     private Gyroscope gyroscope;
     int counter=0;
     public MqttAndroidClient client;
-    final String serverUri = "tcp://localhost:1883";
     final String clientId = "ExampleAndroidClient";
     final String subscriptionTopic = "iot_data";
+    private byte[] gyroValues = new byte[3];
+    private byte[] accellValues = new byte[3];
+    private byte[] sensorData = new byte[6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 // Create Graph and add to URL
         //tv1 = (TextView) findViewById(R.id.AccelerometerTextView);
         //tv2 = (TextView) findViewById(R.id.GyroTextView);
         graphView= findViewById(R.id.graph);
         series  = new LineGraphSeries<>(getDataPoint());
-        //series2 = new LineGraphSeries<>(getDataPoint());
-        //series3 = new LineGraphSeries<>(getDataPoint());
-
-
-        graphView = createGraph(R.id.graph,series);
+        series2 = new LineGraphSeries<>(getDataPoint());
+        series3 = new LineGraphSeries<>(getDataPoint());
+        graphView = createGraph(R.id.graph,series,series2,series3);
         //graphView2 = createGraph(R.id.graph2,series2);
-        //graphView3 = createGraph(R.id.graph3,series3);
 
 
 // Create button and add listener to URL
@@ -74,19 +78,18 @@ public class MainActivity extends AppCompatActivity {
         accelerometer.setListener(new Accelerometer.Listener() {
             @Override
             public void onTranslation(float tx, float ty, float tz) {
-                String text = "Accelerometer X :" + tx + " Y : " + ty + " Z :" + tz;
-                if(tx>1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.RED);
-                    doMqttPublish(text);
-
-                }else if(tx< -1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.BLUE);
-                    doMqttPublish(text);
+                //String text = " X :" + tx + " Y : " + ty + " Z :" + tz;
+                //().getDecorView().setBackgroundColor(Color.RED);
+                if(tx>1.0f || tx<-1.0f ||ty>1.0f || ty<-1.0f || tz>1.0f || tz<-1.0f) {
+                    sensorData[0] = (byte) tx;
+                    sensorData[1] = (byte) ty;
+                    sensorData[2] = (byte) tz;
+                    //doMqttPublish(text,"phone/Accelerometer");
+                    doMqttPublishByte(sensorData, "phone");
                 }
-                //tv1.setText(text);
-                series.appendData(new DataPoint(counter,tx),false,100);
-                //series2.appendData(new DataPoint(counter,ty),false,100);
-                //series3.appendData(new DataPoint(counter,tz),false,100);
+                series.appendData(new DataPoint(counter, tx), false, 100);
+                series2.appendData(new DataPoint(counter, ty), false, 100);
+                series3.appendData(new DataPoint(counter, tz), false, 100);
                 counter++;
 
             }
@@ -95,16 +98,14 @@ public class MainActivity extends AppCompatActivity {
         gyroscope.setListener(new Gyroscope.Listener() {
             @Override
             public void onRotation(float rx, float ry, float rz) {
-                String text = "Gyroscope X : " + rx + " Y : " + ry + " Z : " + rz;
-                if(rz > 1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.GREEN);
-                    doMqttPublish(text);
-                }else if(rz < -1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.YELLOW);
-                    doMqttPublish(text);
+                //String text = " X : " + rx + " Y : " + ry + " Z : " + rz;
+                if(rx>1.0f || rx<-1.0f ||ry>1.0f || ry<-1.0f || rz>1.0f || rz<-1.0f) {
+                    sensorData[3] = (byte) rx;
+                    sensorData[4] = (byte) ry;
+                    sensorData[5] = (byte) rz;
+                    doMqttPublishByte(sensorData, "phone");
+                    //tv2.setText(text);
                 }
-                //tv2.setText(text);
-
             }
         });
     }
@@ -126,14 +127,19 @@ public class MainActivity extends AppCompatActivity {
         gyroscope.unregister();
     }
 
-    public GraphView createGraph(int id,LineGraphSeries series){
+    public GraphView createGraph(int id, LineGraphSeries series, LineGraphSeries series2, LineGraphSeries<DataPoint> series3){
         GraphView graphView = findViewById(id);
         graphView.getViewport().setMaxY(5);
         graphView.getViewport().setMinX(0);
         graphView.getViewport().setMinY(-5);
         graphView.getViewport().setXAxisBoundsManual(false);
         graphView.getViewport().setYAxisBoundsManual(true);
+        series.setColor(Color.BLUE);
+        series2.setColor(Color.RED);
+        series3.setColor(Color.GREEN);
         graphView.addSeries(series);
+        graphView.addSeries(series2);
+        graphView.addSeries(series3);
         return graphView;
     }
     public void createMqttConnection(){
@@ -162,10 +168,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    public void doMqttPublish(String payload){
+// if you want to publish as a string
+    public void doMqttPublish(String payload,String topic){
         if(isMqttstarted() == true){
-            String topic = "phone/Gyros";
+            //String topic = "phone/Gyros";
             //String payload = "the payload";
             byte[] encodedPayload;
             try {
@@ -176,7 +182,20 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
 
+    public void doMqttPublishByte(byte[] payload,String topic){
+        if(isMqttstarted() == true){
+            //String topic = "phone/Gyros";
+            //String payload = "the payload";
+            try {
+                //encodedPayload = payload.getBytes("UTF-8");
+                MqttMessage message = new MqttMessage(payload);
+                client.publish(topic, message);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean isMqttstarted() {

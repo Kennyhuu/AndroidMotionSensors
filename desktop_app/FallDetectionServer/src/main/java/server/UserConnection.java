@@ -19,9 +19,8 @@ public class UserConnection {
 	
 	protected void start(){
 		MqttCallback accelCallback = new MqttCalback();
-		MqttClient accelMqtt = createMqttSubscriber("phone/Accelerometer",accelCallback);
-		MqttCallback gyrosCallball = new MqttCalback();
-		MqttClient gyrosMqtt = createMqttSubscriber("phone/Gyros",gyrosCallball);
+		MqttClient accelMqtt = createMqttSubscriber("phone",accelCallback);
+
 	}
 
 	public MqttClient createMqttSubscriber(String topic, MqttCallback callback){
