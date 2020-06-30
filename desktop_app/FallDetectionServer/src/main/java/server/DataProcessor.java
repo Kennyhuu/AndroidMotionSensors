@@ -2,7 +2,7 @@ package server;
 
 import java.util.ArrayList;
 
-public class DataProcessor {
+class DataProcessor {
 	
 	private Server server;
 	private ArrayList<MovementData> dataList;

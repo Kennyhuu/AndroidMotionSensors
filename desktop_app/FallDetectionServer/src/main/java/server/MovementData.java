@@ -15,7 +15,9 @@ public class MovementData implements Serializable{
 		this(0f,0f,0f,0f,0f,0f);
 	}
 
-	protected MovementData(float ax, float ay, float az, float px, float py, float pz){
+	//should be protected TODO
+	public 
+	MovementData(float ax, float ay, float az, float px, float py, float pz){
 		accX = ax;
 		accY = ay;
 		accZ = az;

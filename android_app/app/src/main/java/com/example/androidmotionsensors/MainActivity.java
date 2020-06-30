@@ -1,10 +1,11 @@
 package com.example.androidmotionsensors;
 
-import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,51 +16,40 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    public TextView tv1;
-    public TextView tv2;
     public GraphView graphView;
-    public GraphView graphView2;
-    public GraphView graphView3;
     public LineGraphSeries<DataPoint> series;
-    public LineGraphSeries<DataPoint> series2;
-    public LineGraphSeries<DataPoint> series3;
     public Button button;
     private boolean mqttstarted = false;
     private Accelerometer accelerometer;
     private Gyroscope gyroscope;
     int counter=0;
     public MqttAndroidClient client;
-    final String serverUri = "tcp://localhost:1883";
+    final String serverUri = "tcp://192.168.0.241:1883";
     final String clientId = "ExampleAndroidClient";
-    final String subscriptionTopic = "iot_data";
+    final String topic = "phone/data";
+    private MovementData currentData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-// Create Graph and add to URL
-        //tv1 = (TextView) findViewById(R.id.AccelerometerTextView);
-        //tv2 = (TextView) findViewById(R.id.GyroTextView);
+        // Create Graph and add to URL
         graphView= findViewById(R.id.graph);
-        series  = new LineGraphSeries<>(getDataPoint());
-        //series2 = new LineGraphSeries<>(getDataPoint());
-        //series3 = new LineGraphSeries<>(getDataPoint());
-
-
+        series  = new LineGraphSeries<>();
+        series.appendData(new DataPoint(0,0),false,100);
         graphView = createGraph(R.id.graph,series);
-        //graphView2 = createGraph(R.id.graph2,series2);
-        //graphView3 = createGraph(R.id.graph3,series3);
 
 
-// Create button and add listener to URL
+        // Create button and add listener to URL
         button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,49 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         accelerometer = new Accelerometer(this);
+        accelerometer.setListener(this);
         gyroscope = new Gyroscope(this);
-        accelerometer.setListener(new Accelerometer.Listener() {
-            @Override
-            public void onTranslation(float tx, float ty, float tz) {
-                String text = "Accelerometer X :" + tx + " Y : " + ty + " Z :" + tz;
-                if(tx>1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.RED);
-                    doMqttPublish(text);
-
-                }else if(tx< -1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.BLUE);
-                    doMqttPublish(text);
-                }
-                //tv1.setText(text);
-                series.appendData(new DataPoint(counter,tx),false,100);
-                //series2.appendData(new DataPoint(counter,ty),false,100);
-                //series3.appendData(new DataPoint(counter,tz),false,100);
-                counter++;
-
-            }
-        });
-
-        gyroscope.setListener(new Gyroscope.Listener() {
-            @Override
-            public void onRotation(float rx, float ry, float rz) {
-                String text = "Gyroscope X : " + rx + " Y : " + ry + " Z : " + rz;
-                if(rz > 1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.GREEN);
-                    doMqttPublish(text);
-                }else if(rz < -1.0f){
-                    getWindow().getDecorView().setBackgroundColor(Color.YELLOW);
-                    doMqttPublish(text);
-                }
-                //tv2.setText(text);
-
-            }
-        });
-    }
-
-    private DataPoint[] getDataPoint() {
-        return new DataPoint[]{
-        new DataPoint(0,0)
-        };
+        gyroscope.setListener(this);
+        currentData =new MovementData();
     }
 
     protected void onResume() {
@@ -126,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         gyroscope.unregister();
     }
 
-    public GraphView createGraph(int id,LineGraphSeries series){
+    public GraphView createGraph(int id,LineGraphSeries<DataPoint> series){
         GraphView graphView = findViewById(id);
         graphView.getViewport().setMaxY(5);
         graphView.getViewport().setMinX(0);
@@ -136,54 +87,72 @@ public class MainActivity extends AppCompatActivity {
         graphView.addSeries(series);
         return graphView;
     }
-    public void createMqttConnection(){
-        // Create MQTT Client
-        String clientId = MqttClient.generateClientId();
-        client =
-                new MqttAndroidClient(this.getApplicationContext(), "tcp://192.168.178.108:1883",
-                        clientId);
 
+    public void createMqttConnection(){
+        client = new MqttAndroidClient(this.getApplicationContext(), serverUri, clientId);
         try {
             IMqttToken token = client.connect();
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     // We are connected
-                    setMqttstarted(true);
+                    mqttstarted=true;
+                    new Timer().schedule(new TimerTask(){
+                        @Override
+                        public void run() {
+                            doMqttPublish();
+                        }},20L,20L);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     // Something went wrong e.g. connection timeout or firewall problems
-                    setMqttstarted(false);
+                    mqttstarted=false;
                 }
             });
         } catch (MqttException e) {
             e.printStackTrace();
         }
+
     }
 
-    public void doMqttPublish(String payload){
-        if(isMqttstarted() == true){
-            String topic = "phone/Gyros";
-            //String payload = "the payload";
-            byte[] encodedPayload;
+    public void doMqttPublish(){
+        if(mqttstarted){
             try {
-                encodedPayload = payload.getBytes("UTF-8");
-                MqttMessage message = new MqttMessage(encodedPayload);
+                ByteBuffer buffer = ByteBuffer.allocate(6*4);
+                synchronized (currentData){
+                    buffer.putFloat(currentData.accX).putFloat(currentData.accY).putFloat(currentData.accZ).putFloat(currentData.posX).putFloat(currentData.posY).putFloat(currentData.posZ);
+                }
+                MqttMessage message = new MqttMessage(buffer.array());
                 client.publish(topic, message);
-            } catch (UnsupportedEncodingException | MqttException e) {
+            } catch (MqttException e) {
                 e.printStackTrace();
             }
         }
 
     }
 
-    public boolean isMqttstarted() {
-        return mqttstarted;
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if(sensorEvent.sensor.getType()==Sensor.TYPE_LINEAR_ACCELERATION){
+            synchronized (currentData){
+                currentData.accX = sensorEvent.values[0];
+                currentData.accY = sensorEvent.values[1];
+                currentData.accZ = sensorEvent.values[2];
+            }
+        }
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_GYROSCOPE){
+            synchronized (currentData) {
+                currentData.posX = sensorEvent.values[0];
+                currentData.posY = sensorEvent.values[1];
+                currentData.posZ = sensorEvent.values[2];
+            }
+        }
+
     }
 
-    public void setMqttstarted(boolean mqttstarted) {
-        this.mqttstarted = mqttstarted;
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 }
