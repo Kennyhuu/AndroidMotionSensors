@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,11 +31,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public GraphView graphView;
     public LineGraphSeries<DataPoint> series;
+    public TextView textView;
     public Button button;
     private boolean mqttstarted = false;
     private Accelerometer accelerometer;
     private Gyroscope gyroscope;
-    int counter=0;
     public MqttAndroidClient client;
 //    final String serverUri = "tcp://192.168.0.241:1883";// Horva
     final String serverUri = "tcp://192.168.178.108:1883";// Khiem
@@ -48,19 +49,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
-        // Create Graph and add to URL
-        graphView= findViewById(R.id.graph);
-        series  = new LineGraphSeries<>();
-        series.appendData(new DataPoint(0,0),false,100);
-        graphView = createGraph(R.id.graph,series);
+        // Create Graph and add to URL -- removed for better computing
+        //graphView= findViewById(R.id.graph);
+        //series  = new LineGraphSeries<>();
+        //series.appendData(new DataPoint(0,0),false,100);
+        //graphView = createGraph(R.id.graph,series);
 
+        //
+        textView= findViewById(R.id.textView3);
 
         // Create button and add listener to URL
         button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createMqttConnection();
+                if(!mqttstarted){
+                    createMqttConnection();
+                }
+                else {
+                    disconnectMqttConnection();
+                }
+
             }
         });
 
@@ -101,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
+                    textView.setText("Connected");
+                    button.setEnabled(false);
                     // We are connected
                     mqttstarted=true;
                     new Timer().schedule(new TimerTask(){
@@ -113,13 +124,40 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     // Something went wrong e.g. connection timeout or firewall problems
+                    textView.setText("Not Connected");
+                    button.setEnabled(true);
                     mqttstarted=false;
                 }
             });
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
 
+    public void disconnectMqttConnection(){
+        try {
+            IMqttToken disconToken = client.disconnect();
+            disconToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    // we are now successfully disconnected
+                    textView.setText("Disconnected");
+                    mqttstarted=false;
+                    button.setEnabled(true);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken,
+                                      Throwable exception) {
+                    // something went wrong, but probably we are disconnected anyway
+                    textView.setText("Connected");
+                    mqttstarted=true;
+                    button.setEnabled(false);
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
     }
 
     public void doMqttPublish(){
