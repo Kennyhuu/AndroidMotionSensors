@@ -47,3 +47,13 @@ hs_err_pid*
 /android_app/.gradle/
 /android_app/.idea/
 /desktop_app/FallDetectionServer/.gradle
+/android_app/.gradle/5.6.4
+/android_app/.gradle/
+/android_app/.idea/
+/android_app/local.properties
+/desktop_app/FallDetectionServer/FallDetectionServer.iml
+/desktop_mqtt_example/paho*
+/desktop_app/gradlew
+/desktop_app/gradlew.bat
+/desktop_app/gradle/wrapper/gradle-wrapper.properties
+/android_app/local.properties
