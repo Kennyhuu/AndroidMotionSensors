@@ -1,5 +1,8 @@
 package com.example.androidmotionsensors;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,14 +36,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Gyroscope gyroscope;
     int counter=0;
     public MqttAndroidClient client;
-    final String serverUri = "tcp://192.168.0.241:1883";
+//    final String serverUri = "tcp://192.168.0.241:1883";// Horva
+    final String serverUri = "tcp://192.168.178.108:1883";// Khiem
     final String clientId = "ExampleAndroidClient";
     final String topic = "phone/data";
     private MovementData currentData;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
         // Create Graph and add to URL
         graphView= findViewById(R.id.graph);
