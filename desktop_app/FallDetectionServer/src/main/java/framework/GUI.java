@@ -11,20 +11,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.LinkedList;
-import java.util.Random;
-import java.util.TimerTask;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.Timer;
-import javax.swing.ListSelectionModel;
 import server.DataObserver;
 import server.EmergencyService;
 import server.MovementData;
@@ -33,21 +25,17 @@ import server.UserInterface;
 
 public class GUI implements DataObserver, UserInterface, EmergencyService {
 
-	private final boolean multipleConn = false;
 	private LinkedList<MovementData> dataList;
 	private JPanel panel;
-	private Server server;
+	//private Server server;
 	
 	public GUI() {
 		dataList = new LinkedList<>();
-		server = new Server(this,this,this);
+		//server = new Server(this,this,this); 
+		new Server(this,this,this);
 	}
 	
 	public void setup(){
-		if(multipleConn) {
-			setup_multiple_connection();
-			return;
-		}
 		JFrame frame = new JFrame("FallDetectionServer");
 		
 		panel = new JPanel(new BorderLayout()){
@@ -115,60 +103,6 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 		}, (long)20,(long)20);*/
 	}
 	
-	private void setup_multiple_connection()
-	{
-	JFrame frame = new JFrame("Connections");
-	
-	JPanel panel = new JPanel(new BorderLayout());
-	JPanel panel2 = new JPanel(new BorderLayout());
-	JPanel panel3 = new JPanel();
-	panel3.setPreferredSize(new Dimension(180,100));
-	
-	JList<String> list = new JList<>();
-	list.setPreferredSize(new Dimension(180,500));
-	list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	DefaultListModel<String> listModel = new DefaultListModel<>();
-	list.setModel(listModel);
-			
-	
-	JLabel conn_label = new JLabel("New connection:");
-	conn_label.setHorizontalAlignment(JLabel.CENTER);
-	conn_label.setPreferredSize(new Dimension(180,20));
-	
-	JTextField conn_text = new JTextField(15);
-	
-	JButton conn_button = new JButton("Add");
-	conn_button.addActionListener(new ActionListener(){
-		@Override
-		public void actionPerformed(ActionEvent e){
-			String s = conn_text.getText();
-			if(s.length()>0 && s.length()<=20){
-				conn_text.setText("");
-				int i = listModel.getSize();
-				listModel.add(i,s);
-				list.setSelectedIndex(i);
-				list.ensureIndexIsVisible(i);
-			}
-		}
-	});
-	
-	JLabel temp = new JLabel("temp");
-	temp.setPreferredSize(new Dimension(600,600));
-	
-	panel3.add(conn_label);
-	panel3.add(conn_text);
-	panel3.add(conn_button);
-	panel2.add(list,BorderLayout.CENTER);
-	panel2.add(panel3,BorderLayout.SOUTH);
-	panel.add(panel2,BorderLayout.WEST);
-	panel.add(temp,BorderLayout.CENTER);
-	
-	frame.add(panel);
-	frame.pack();
-	frame.setVisible(true);
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-
 	
 	@Override
 	public boolean newData(MovementData data) {

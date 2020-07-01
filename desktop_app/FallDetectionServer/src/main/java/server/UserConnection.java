@@ -18,9 +18,6 @@ class UserConnection implements MqttCallback{
 	protected UserConnection(DataObserver dataOb, DataProcessor dp){
 		observer=dataOb;
 		processor=dp;
-	}
-
-	protected void start(){
 		MqttClient client = null;
 		try {
 			String ipAdresse = Inet4Address.getLocalHost().getHostAddress();
@@ -36,6 +33,10 @@ class UserConnection implements MqttCallback{
 		}
 	}
 
+	protected void start(){
+		
+	}
+
 	@Override
 	public void connectionLost(Throwable cause) {
 		// TODO on conn lost notify Server->UI->connLost()
@@ -48,8 +49,10 @@ class UserConnection implements MqttCallback{
 		//System.out.println("Message received:\n\t "+ topic + new String(message.getPayload()));
 		
 		ByteBuffer buffer = ByteBuffer.wrap(message.getPayload());
-		observer.newData(new MovementData(buffer.getFloat(), buffer.getFloat(), buffer.getFloat(),
-				buffer.getFloat(), buffer.getFloat(), buffer.getFloat()));
+		MovementData data = new MovementData(buffer.getFloat(), buffer.getFloat(), buffer.getFloat(),
+				buffer.getFloat(), buffer.getFloat(), buffer.getFloat());
+		processor.calc(data);
+		observer.newData(new MovementData(data));
 	}
 
 	@Override
