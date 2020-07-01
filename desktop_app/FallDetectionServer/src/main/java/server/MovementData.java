@@ -1,6 +1,9 @@
 package server;
 
-public class MovementData {
+import java.io.Serializable;
+
+public class MovementData implements Serializable{
+	private static final long serialVersionUID = 1L;
 	public float accX;
 	public float accY;
 	public float accZ;
@@ -12,7 +15,9 @@ public class MovementData {
 		this(0f,0f,0f,0f,0f,0f);
 	}
 
-	protected MovementData(float ax, float ay, float az, float px, float py, float pz){
+	//should be protected TODO
+	public 
+	MovementData(float ax, float ay, float az, float px, float py, float pz){
 		accX = ax;
 		accY = ay;
 		accZ = az;
