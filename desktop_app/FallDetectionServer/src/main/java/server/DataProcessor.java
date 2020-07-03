@@ -100,7 +100,7 @@ class DataProcessor {
 				if(accMax-accMin<thAccDiff && gyroMax-gyroMin<thGyroDiff)
 					// 2. is the user lying?
 					if((float)Math.acos(data.accY/9.81f)>thAngle)
-						// 3. did the user had a fast movement?
+						// 3. did the user had a fast movement before?
 						if(accMaxLongTerm>thAccLongTerm && gyroMaxLongTerm>thGyroLongTerm)
 							//emergency
 							server.emergency();

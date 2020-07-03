@@ -158,5 +158,21 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 	        return true;
 	    return false;
 	}
+
+	@Override
+	public void noNewMessage() {
+		JOptionPane.showMessageDialog(new JFrame(),
+			    "Cannot see measurements. Please, check your device.",
+			    "Lost messages",
+			    JOptionPane.WARNING_MESSAGE);
+	}
+
+	@Override
+	public void connectionLost() {
+		JOptionPane.showMessageDialog(new JFrame(),
+			    "Connection lost. Please, check your device.",
+			    "Lost conenction",
+			    JOptionPane.WARNING_MESSAGE);
+	}
 	
 }

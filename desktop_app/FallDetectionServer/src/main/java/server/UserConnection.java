@@ -3,6 +3,8 @@ package server;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -14,10 +16,21 @@ class UserConnection implements MqttCallback{
 	
 	private DataObserver observer;
 	private DataProcessor processor;
+	private Server server;
 	
-	protected UserConnection(DataObserver dataOb, DataProcessor dp){
+	private TimerTask timerTaskNoMessage;
+	private Timer timerNoMessage;
+	
+	protected UserConnection(DataObserver dataOb, DataProcessor dp, Server s){
 		observer=dataOb;
 		processor=dp;
+		server=s;
+		timerTaskNoMessage = new TimerTask(){
+			@Override
+			public void run() {
+				server.noNewMessage();
+			}
+		};
 		MqttClient client = null;
 		try {
 			String ipAdresse = Inet4Address.getLocalHost().getHostAddress();
@@ -27,6 +40,8 @@ class UserConnection implements MqttCallback{
 			client.setCallback(this);
 			client.connect();
 			client.subscribe("phone/data");
+			timerNoMessage=new Timer();
+			timerNoMessage.schedule(timerTaskNoMessage, 1000 * 2);
 
 		} catch (MqttException | UnknownHostException e) {
 			e.printStackTrace();
@@ -53,6 +68,10 @@ class UserConnection implements MqttCallback{
 				buffer.getFloat(), buffer.getFloat(), buffer.getFloat());
 		processor.calc(data);
 		observer.newData(new MovementData(data));
+		
+		timerNoMessage.cancel();
+		timerNoMessage=new Timer();
+		timerNoMessage.schedule(timerTaskNoMessage, 1000 *2);
 	}
 
 	@Override
