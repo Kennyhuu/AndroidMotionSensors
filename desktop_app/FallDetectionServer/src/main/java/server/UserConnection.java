@@ -54,9 +54,7 @@ class UserConnection implements MqttCallback{
 
 	@Override
 	public void connectionLost(Throwable cause) {
-		// TODO on conn lost notify Server->UI->connLost()
-		// need a new function to alert user on lack of messages
-		System.out.println("Connextion to MQTT Broker lost!");
+		server.conenctionLost();
 	}
 
 	@Override
