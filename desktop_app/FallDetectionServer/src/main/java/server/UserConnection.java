@@ -7,17 +7,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-class UserConnection implements MqttCallback{
+class UserConnection implements MqttCallbackExtended{
 	
 	private DataObserver observer;
 	private DataProcessor processor;
 	private Server server;
+	private MqttClient client;
 	
+	private boolean noMessage;
 	private TimerTask timerTaskNoMessage;
 	private Timer timerNoMessage;
 	
@@ -28,23 +32,33 @@ class UserConnection implements MqttCallback{
 		timerTaskNoMessage = new TimerTask(){
 			@Override
 			public void run() {
-				server.noNewMessage();
+				if(client.isConnected() && noMessage){
+					System.out.println("No-message thread executed.");
+					processor.resetData();
+					server.noNewMessage();
+				}
+				noMessage=true;
 			}
 		};
-		MqttClient client = null;
+		noMessage=true;
+		timerNoMessage=new Timer();
+		client = null;
 		try {
 			String ipAdresse = Inet4Address.getLocalHost().getHostAddress();
 			String portNr = "1883";
 			String mqttAdresse = "tcp://"+ipAdresse+":"+portNr;
-			client = new MqttClient(mqttAdresse, MqttClient.generateClientId());
+			client = new MqttClient(mqttAdresse, MqttClient.generateClientId(),new MemoryPersistence());
 			client.setCallback(this);
-			client.connect();
-			client.subscribe("phone/data");
-			timerNoMessage=new Timer();
-			timerNoMessage.schedule(timerTaskNoMessage, 1000 * 2);
-
+			MqttConnectOptions conOpt = new MqttConnectOptions();
+	        conOpt.setCleanSession(true);
+	        conOpt.setAutomaticReconnect(true);
+	        conOpt.setConnectionTimeout(60);
+	        //conOpt.setPassword(password);
+	        //conOpt.setUserName(userName);
+			client.connect(conOpt);
+			timerNoMessage.schedule(timerTaskNoMessage, 1000 *10, 1000 * 10);
 		} catch (MqttException | UnknownHostException e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 
@@ -54,25 +68,31 @@ class UserConnection implements MqttCallback{
 
 	@Override
 	public void connectionLost(Throwable cause) {
-		server.conenctionLost();
+		//server.conenctionLost();
+		System.out.println("Connection lost.");
 	}
 
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
-		//System.out.println("Message received:\n\t "+ topic + new String(message.getPayload()));
-		
 		ByteBuffer buffer = ByteBuffer.wrap(message.getPayload());
 		MovementData data = new MovementData(buffer.getFloat(), buffer.getFloat(), buffer.getFloat(),
 				buffer.getFloat(), buffer.getFloat(), buffer.getFloat());
 		processor.calc(data);
 		observer.newData(new MovementData(data));
-		
-		timerNoMessage.cancel();
-		timerNoMessage=new Timer();
-		timerNoMessage.schedule(timerTaskNoMessage, 1000 *2);
+		noMessage=false;
 	}
 
 	@Override
 	public void deliveryComplete(IMqttDeliveryToken token) {}
+
+	@Override
+	public void connectComplete(boolean reconnect, String serverURI) {
+		System.out.println("Connection established.");
+		try {
+			client.subscribe("phone/data");
+		} catch (MqttException e) {
+			System.out.println(e.toString());
+		}
+	}
 	
 }

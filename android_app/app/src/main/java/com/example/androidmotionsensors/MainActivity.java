@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Accelerometer accelerometer;
     private Gyroscope gyroscope;
     public MqttAndroidClient client;
-//    final String serverUri = "tcp://192.168.0.241:1883";// Horva
-    final String serverUri = "tcp://192.168.178.108:1883";// Khiem
+    final String serverUri = "tcp://192.168.0.241:1883";// Horva
+//    final String serverUri = "tcp://192.168.178.108:1883";// Khiem
     final String clientId = "ExampleAndroidClient";
     final String topic = "phone/data";
     private MovementData currentData;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return graphView;
     }
 
-    public void createMqttConnection(){
+    private void createMqttConnection(){
         client = new MqttAndroidClient(this.getApplicationContext(), serverUri, clientId);
         try {
             IMqttToken token = client.connect();
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         @Override
                         public void run() {
                             doMqttPublish();
-                        }},20L,20L);
+                        }},20L,200L);
                 }
 
                 @Override
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void disconnectMqttConnection(){
+    private void disconnectMqttConnection(){
         try {
             IMqttToken disconToken = client.disconnect();
             disconToken.setActionCallback(new IMqttActionListener() {
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void doMqttPublish(){
+    private void doMqttPublish(){
         if(mqttstarted){
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(6*4);

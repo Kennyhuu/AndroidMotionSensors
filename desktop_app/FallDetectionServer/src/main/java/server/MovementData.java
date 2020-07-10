@@ -1,9 +1,6 @@
 package server;
 
-import java.io.Serializable;
-
-public class MovementData implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class MovementData{
 	public float accX;
 	public float accY;
 	public float accZ;

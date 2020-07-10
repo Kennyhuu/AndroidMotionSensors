@@ -86,7 +86,7 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 				}
 			}
 		};
-		panel.setPreferredSize(new Dimension(700,700));
+		panel.setPreferredSize(new Dimension(700,700)); //700*700
 		
 		frame.add(panel);
 		frame.pack();
