@@ -53,8 +53,8 @@ class UserConnection implements MqttCallbackExtended{
 	        conOpt.setCleanSession(true);
 	        conOpt.setAutomaticReconnect(true);
 	        conOpt.setConnectionTimeout(60);
-	        //conOpt.setPassword(password);
-	        //conOpt.setUserName(userName);
+	        conOpt.setPassword(new String("sensor").toCharArray());
+	        conOpt.setUserName("phone");
 			client.connect(conOpt);
 			timerNoMessage.schedule(timerTaskNoMessage, 1000 *10, 1000 * 10);
 		} catch (MqttException | UnknownHostException e) {
