@@ -84,6 +84,13 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 						}
 					}
 				}
+				
+				g2.drawString("Acc - X",GAP+5,GAP);
+				g2.drawString("Acc - Y",GAP+5,GAP+1*(H+GAP));
+				g2.drawString("Acc - Z",GAP+5,GAP+2*(H+GAP));
+				g2.drawString("Gyro - X",GAP+W+GAP+5,GAP);
+				g2.drawString("Gyro - Y",GAP+W+GAP+5,GAP+1*(H+GAP));
+				g2.drawString("Gyro - Z",GAP+W+GAP+5,GAP+2*(H+GAP));
 			}
 		};
 		panel.setPreferredSize(new Dimension(700,700)); //700*700
