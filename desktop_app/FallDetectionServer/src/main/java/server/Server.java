@@ -22,9 +22,8 @@ public class Server {
 			@Override
 			public void run(){
 				boolean userOK = userinterface.checkUser();
-				if(userOK)
-					return;
-				emergencyservice.callHelp();
+				if(!userOK)
+					emergencyservice.callHelp();
 				alerted=false;
 			}
 		}.start();

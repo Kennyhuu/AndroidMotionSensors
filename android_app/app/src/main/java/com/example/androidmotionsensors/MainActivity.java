@@ -19,7 +19,10 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -27,7 +30,7 @@ import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, MqttCallback {
 
     public GraphView graphView;
     public LineGraphSeries<DataPoint> series;
@@ -37,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Accelerometer accelerometer;
     private Gyroscope gyroscope;
     public MqttAndroidClient client;
-//    final String serverUri = "tcp://192.168.0.241:1883";// Horva
-    final String serverUri = "tcp://192.168.178.108:1883";// Khiem
+    final String serverUri = "tcp://192.168.0.241:1883";// Horva
+//    final String serverUri = "tcp://192.168.178.108:1883";// Khiem
     final String clientId = "ExampleAndroidClient";
     final String topic = "phone/data";
     private MovementData currentData;
@@ -103,10 +106,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return graphView;
     }
 
-    public void createMqttConnection(){
+    private void createMqttConnection(){
         client = new MqttAndroidClient(this.getApplicationContext(), serverUri, clientId);
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setUserName("phone");
+        options.setPassword("sensor".toCharArray());
         try {
-            IMqttToken token = client.connect();
+            IMqttToken token = client.connect(options);
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
@@ -118,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         @Override
                         public void run() {
                             doMqttPublish();
-                        }},20L,20L);
+                        }},20L,200L);// should be 20 ms
                 }
 
                 @Override
@@ -134,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void disconnectMqttConnection(){
+    private void disconnectMqttConnection(){
         try {
             IMqttToken disconToken = client.disconnect();
             disconToken.setActionCallback(new IMqttActionListener() {
@@ -160,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void doMqttPublish(){
+    private void doMqttPublish(){
         if(mqttstarted){
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(6*4);
@@ -197,6 +203,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+        textView.setText("Disconnected");
+        mqttstarted=false;
+        button.setEnabled(true);
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
 
     }
 }
