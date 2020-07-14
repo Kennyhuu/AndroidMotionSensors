@@ -11,18 +11,14 @@
         android:layout_height="100dp"
         android:layout_row="3"
         android:layout_column="0"
-        android:layout_x="0dp"
-        android:layout_y="542dp"
         android:text="@string/start_track_senor_data" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
+        android:layout_height="126dp"
         android:layout_row="0"
         android:layout_column="0"
-        android:layout_x="4dp"
-        android:layout_y="168dp"
         android:text="Connection Status :"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
 
