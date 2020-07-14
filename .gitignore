@@ -57,3 +57,13 @@ hs_err_pid*
 /desktop_app/gradlew.bat
 /desktop_app/gradle/wrapper/gradle-wrapper.properties
 /android_app/local.properties
+/android_app/.gradle/5.6.4/executionHistory/executionHistory.bin
+/android_app/.gradle/5.6.4/executionHistory/executionHistory.lock
+/android_app/.gradle/5.6.4/fileHashes/fileHashes.bin
+/android_app/.gradle/5.6.4/fileHashes/resourceHashesCache.bin
+/android_app/.gradle/5.6.4/javaCompile/classAnalysis.bin
+/android_app/.gradle/5.6.4/javaCompile/jarAnalysis.bin
+/android_app/.gradle/5.6.4/javaCompile/javaCompile.lock
+/android_app/.gradle/5.6.4/javaCompile/taskHistory.bin
+/android_app/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+/android_app/.gradle/buildOutputCleanup/outputFiles.bin
