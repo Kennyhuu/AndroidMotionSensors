@@ -40,7 +40,7 @@ class DataProcessor {
 		boolean demo = true;
 		if(demo) {
 			if((float) Math.sqrt(data.accX*data.accX+data.accY*data.accY+data.accZ*data.accZ)>9.81*2 ){
-				server.emergency();
+				server.emergency(data);
 			}
 			return;
 		}
@@ -49,8 +49,10 @@ class DataProcessor {
 		
 		//first element - oldest measurement
 		//last  element - newest measurement
-		acc.add(new Float((float) Math.sqrt(data.accX*data.accX+data.accY*data.accY+data.accZ*data.accZ)));
-		gyro.add(new Float((float) Math.sqrt(data.posX*data.posX+data.posY*data.posY+data.posZ*data.posZ)));
+		acc.add(
+				(float) Math.sqrt(data.accX * data.accX + data.accY * data.accY + data.accZ * data.accZ));
+		gyro.add(
+				(float) Math.sqrt(data.posX * data.posX + data.posY * data.posY + data.posZ * data.posZ));
 		
 		if(acc.size()==251){
 			//shift time window

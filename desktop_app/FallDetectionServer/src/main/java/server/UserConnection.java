@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import java.util.logging.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -24,7 +25,8 @@ class UserConnection implements MqttCallbackExtended{
 	private boolean noMessage;
 	private TimerTask timerTaskNoMessage;
 	private Timer timerNoMessage;
-	
+  private final static Logger LOGGER = Logger.getLogger(UserConnection.class.getName());
+
 	protected UserConnection(DataObserver dataOb, DataProcessor dp, Server s){
 		observer=dataOb;
 		processor=dp;
@@ -33,7 +35,7 @@ class UserConnection implements MqttCallbackExtended{
 			@Override
 			public void run() {
 				if(client.isConnected() && noMessage){
-					System.out.println("No-message thread executed.");
+          LOGGER.info("No-message thread executed.");
 					processor.resetData();
 					server.noNewMessage();
 				}
@@ -58,7 +60,7 @@ class UserConnection implements MqttCallbackExtended{
 			client.connect(conOpt);
 			timerNoMessage.schedule(timerTaskNoMessage, 1000 *10, 1000 * 10);
 		} catch (MqttException | UnknownHostException e) {
-			System.out.println(e.toString());
+			LOGGER.warning(e.toString());
 		}
 	}
 
@@ -69,7 +71,7 @@ class UserConnection implements MqttCallbackExtended{
 	@Override
 	public void connectionLost(Throwable cause) {
 		//server.conenctionLost();
-		System.out.println("Connection lost.");
+		LOGGER.info("Connection lost");
 	}
 
 	@Override
@@ -87,7 +89,7 @@ class UserConnection implements MqttCallbackExtended{
 
 	@Override
 	public void connectComplete(boolean reconnect, String serverURI) {
-		System.out.println("Connection established.");
+		LOGGER.info("Connection established");
 		try {
 			client.subscribe("phone/data");
 		} catch (MqttException e) {
