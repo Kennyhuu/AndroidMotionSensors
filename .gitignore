@@ -57,3 +57,5 @@ hs_err_pid*
 /desktop_app/gradlew.bat
 /desktop_app/gradle/wrapper/gradle-wrapper.properties
 /android_app/local.properties
+/desktop_app/FallDetectionServer/src/main/java/resource/
+/desktop_app/FallDetectionServer/src/main/java/resource/data.csv
