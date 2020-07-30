@@ -67,3 +67,5 @@ hs_err_pid*
 /android_app/.gradle/5.6.4/javaCompile/taskHistory.bin
 /android_app/.gradle/buildOutputCleanup/buildOutputCleanup.lock
 /android_app/.gradle/buildOutputCleanup/outputFiles.bin
+/desktop_app/FallDetectionServer/src/main/java/resource/
+/desktop_app/FallDetectionServer/src/main/java/resource/data.csv

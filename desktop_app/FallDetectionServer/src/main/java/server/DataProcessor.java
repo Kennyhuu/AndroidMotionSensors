@@ -13,6 +13,8 @@ class DataProcessor {
 	
 	private TimerTask timerTaskNoMessage;
 	private Timer timerNoMessage;
+
+	private MovementData movData;
 	
 	protected DataProcessor(Server s){
 		server=s;
@@ -25,6 +27,7 @@ class DataProcessor {
 		thAngle = 35f;
 		thAccLongTerm = 24.525f;
 		thGyroLongTerm = 340f;
+		server.createCSVFile();
 		
 	}
 	
