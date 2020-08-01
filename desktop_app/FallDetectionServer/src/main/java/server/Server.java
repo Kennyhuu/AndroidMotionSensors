@@ -17,6 +17,8 @@ public class Server {
   private final static Logger LOGGER = Logger.getLogger(Server.class.getName());
   private UserInterface userinterface;
   private EmergencyService emergencyservice;
+
+
   private boolean alerted;
   private File csvFile;
   //private UserConnection userconnection;
@@ -65,7 +67,6 @@ public class Server {
           emergencyservice.callHelp();
         }
         alerted = false;
-        recordDataIntoCsv(data, userOK);
       }
     }.start();
   }
@@ -103,7 +104,7 @@ public class Server {
     }
   }
 
-  protected void recordDataIntoCsv(MovementData data, boolean userOK) {
+  protected void recordDataIntoCsv(MovementData data, String userOK) {
     if (data != null) {
       if (csvFile.exists()) {
         String absolutePath = csvFile.getAbsolutePath();
@@ -137,5 +138,9 @@ public class Server {
 
   protected void conenctionLost() {
     userinterface.connectionLost();
+  }
+
+  public boolean isAlerted() {
+    return alerted;
   }
 }

@@ -100,7 +100,11 @@ class UserConnection implements MqttCallbackExtended{
 			executorService.scheduleAtFixedRate(new Runnable() {
 				@Override
 				public void run() {
-					server.recordDataIntoCsv(newData, false);
+					if (server.isAlerted()){
+						server.recordDataIntoCsv(newData, "Fall Detected wait for User Answer");
+					}else{
+						server.recordDataIntoCsv(newData, "----");
+					}
 				}
 			}, 5, 200, TimeUnit.MILLISECONDS);
 			alreadyExecuted = true;
