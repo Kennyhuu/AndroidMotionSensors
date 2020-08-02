@@ -4,16 +4,13 @@ import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+//import java.time.format.DateTimeFormatter;
 import java.util.logging.Logger;
-import sun.rmi.runtime.Log;
+//import sun.rmi.runtime.Log;
 
 public class Server {
-  private final static Logger LOGGER = Logger.getLogger(Server.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(Server.class.getName());
 	private UserInterface userinterface;
 	private EmergencyService emergencyservice;
 	private boolean alerted;
@@ -68,7 +65,7 @@ public class Server {
 		LOGGER.info("Path : "+ absolutePath);
 		try {
 			CSVWriter csvWriter = new CSVWriter(new FileWriter(absolutePath,true));
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			//DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 			LocalDateTime now = LocalDateTime.now();
 			String accX = String.valueOf(data.accX);
 			String accY = String.valueOf(data.accY);

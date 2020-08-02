@@ -57,3 +57,12 @@ hs_err_pid*
 /desktop_app/gradlew.bat
 /desktop_app/gradle/wrapper/gradle-wrapper.properties
 /android_app/local.properties
+
+/desktop_app/FallDetectionServer/bin
+/desktop_app/FallDetectionServer/build
+/desktop_app/FallDetectionTest/bin
+/desktop_app/FallDetectionTest/build
+/desktop_app/FallDetectionTest/SisFall/*
+!/desktop_app/FallDetectionTest/SisFall/SA01
+/desktop_app/FallDetectionTest/SisFall/SA01/*
+!/desktop_app/FallDetectionTest/SisFall/SA01/D01_SA01_R01.txt

@@ -1,42 +1,25 @@
-package server;
+package main;
 
 import java.util.LinkedList;
 
-class DataProcessor {
-	
-	private Server server;
+public class DataProcessorTest {
 	private LinkedList<Float> acc;
 	private LinkedList<Float> gyro;
-	private Float thAccDiff,thGyroDiff,thAngle, thAccLongTerm, thGyroLongTerm;
+	public Float thAccDiff,thGyroDiff,thAngle, thAccLongTerm, thGyroLongTerm;
 	
-	protected DataProcessor(Server s){
-		server=s;
-		
+	protected DataProcessorTest(){
 		acc = new LinkedList<>();
 		gyro = new LinkedList<>();
 		
 		thAccDiff = 3.924f;
 		thGyroDiff = 60f;
 		thAngle = 35f;
-		thAccLongTerm = 24.525f;
-		thGyroLongTerm = 340f;
+		thAccLongTerm = 9.81f*3.0f;
+		thGyroLongTerm = 100f;
 		
 	}
 	
-	protected void calc(MovementData data){
-			
-		
-		// CALC FOR PRESENTATION
-		//-----------------------------------
-		boolean demo = true;
-		if(demo) {
-			if((float) Math.sqrt(data.accX*data.accX+data.accY*data.accY+data.accZ*data.accZ)>9.81*2 ){
-				server.emergency(data);
-			}
-			return;
-		}
-		//-----------------------------------
-		
+	protected int calc(MovementDataTest data){
 		
 		//first element - oldest measurement
 		//last  element - newest measurement
@@ -76,12 +59,18 @@ class DataProcessor {
 						if(gyro.get(i)>gyroMax) gyroMax=gyro.get(i);
 					}
 					
-					if(accMax>thAccLongTerm && gyroMax>thGyroLongTerm)
+					if(accMax>thAccLongTerm)
+						if(gyroMax>thGyroLongTerm)
 						//emergency
-						server.emergency();
+							return 0;
+						else return 1;
+					else return 2;
 				}
-			}	
+				else return 3;
+			}
+			else return 4;
 		}
+		else return 5;
 	}
 
 	protected void resetData() {

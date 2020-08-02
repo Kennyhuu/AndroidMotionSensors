@@ -25,7 +25,7 @@ class UserConnection implements MqttCallbackExtended{
 	private boolean noMessage;
 	private TimerTask timerTaskNoMessage;
 	private Timer timerNoMessage;
-  private final static Logger LOGGER = Logger.getLogger(UserConnection.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(UserConnection.class.getName());
 
 	protected UserConnection(DataObserver dataOb, DataProcessor dp, Server s){
 		observer=dataOb;
