@@ -5,7 +5,9 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -26,6 +28,11 @@ class UserConnection implements MqttCallbackExtended{
 	private TimerTask timerTaskNoMessage;
 	private Timer timerNoMessage;
 	private final static Logger LOGGER = Logger.getLogger(UserConnection.class.getName());
+
+  private boolean alreadyExecuted =false;
+
+
+	private MovementData newData;
 
 	protected UserConnection(DataObserver dataOb, DataProcessor dp, Server s){
 		observer=dataOb;
@@ -58,6 +65,7 @@ class UserConnection implements MqttCallbackExtended{
 	        conOpt.setPassword(new String("sensor").toCharArray());
 	        conOpt.setUserName("phone");
 			client.connect(conOpt);
+		  recordData();
 			timerNoMessage.schedule(timerTaskNoMessage, 1000 *10, 1000 * 10);
 		} catch (MqttException | UnknownHostException e) {
 			LOGGER.warning(e.toString());
@@ -79,9 +87,28 @@ class UserConnection implements MqttCallbackExtended{
 		ByteBuffer buffer = ByteBuffer.wrap(message.getPayload());
 		MovementData data = new MovementData(buffer.getFloat(), buffer.getFloat(), buffer.getFloat(),
 				buffer.getFloat(), buffer.getFloat(), buffer.getFloat());
+		setNewData(data);
+		recordData();
 		processor.calc(data);
 		observer.newData(new MovementData(data));
 		noMessage=false;
+	}
+
+	private void recordData(){
+		if(!alreadyExecuted){
+			ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
+			executorService.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					if (server.isAlerted()){
+						server.recordDataIntoCsv(newData, "Fall Detected wait for User Answer");
+					}else{
+						server.recordDataIntoCsv(newData, "----");
+					}
+				}
+			}, 5, 200, TimeUnit.MILLISECONDS);
+			alreadyExecuted = true;
+		}
 	}
 
 	@Override
@@ -96,5 +123,12 @@ class UserConnection implements MqttCallbackExtended{
 			System.out.println(e.toString());
 		}
 	}
-	
+
+	public MovementData getNewData() {
+		return newData;
+	}
+
+	public void setNewData(MovementData newData) {
+		this.newData = newData;
+	}
 }

@@ -20,6 +20,7 @@ class DataProcessor {
 		thAngle = 35f;
 		thAccLongTerm = 24.525f;
 		thGyroLongTerm = 340f;
+		server.createCSVFile();
 		
 	}
 	
