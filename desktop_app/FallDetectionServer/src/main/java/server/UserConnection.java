@@ -87,8 +87,7 @@ class UserConnection implements MqttCallbackExtended{
 		ByteBuffer buffer = ByteBuffer.wrap(message.getPayload());
 		MovementData data = new MovementData(buffer.getFloat(), buffer.getFloat(), buffer.getFloat(),
 				buffer.getFloat(), buffer.getFloat(), buffer.getFloat());
-		setNewData(data);
-		recordData();
+		newData = data;
 		processor.calc(data);
 		observer.newData(new MovementData(data));
 		noMessage=false;
@@ -122,13 +121,5 @@ class UserConnection implements MqttCallbackExtended{
 		} catch (MqttException e) {
 			System.out.println(e.toString());
 		}
-	}
-
-	public MovementData getNewData() {
-		return newData;
-	}
-
-	public void setNewData(MovementData newData) {
-		this.newData = newData;
 	}
 }

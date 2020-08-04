@@ -52,8 +52,8 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 				int W=(700-4*GAP)/2;
 				for(int i=0;i<2;i++){
 					for(int j=0;j<3;j++){
-						g2.drawLine(GAP+i*(W+GAP),GAP+j*(H+GAP),GAP+i*(W+GAP),GAP+H+j*(H+GAP));
-						g2.drawLine(GAP+i*(W+GAP),GAP+H/2+j*(H+GAP),GAP+W+i*(W+GAP),GAP+H/2+j*(H+GAP));
+						g2.drawLine(GAP+i*(W+GAP+GAP),GAP+j*(H+GAP),GAP+i*(W+GAP+GAP),GAP+H+j*(H+GAP));
+						g2.drawLine(GAP+i*(W+GAP+GAP),GAP+H/2+j*(H+GAP),GAP+W+i*(W+GAP+GAP),GAP+H/2+j*(H+GAP));
 						
 						float maxScale=0;
 						
@@ -78,19 +78,33 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 								if(i==1 && j==1) {val=dataList.get(k).posY;val2=dataList.get(k+1).posY;}
 								if(i==1 && j==2) {val=dataList.get(k).posZ;val2=dataList.get(k+1).posZ;}
 
-								g2.drawLine(GAP+i*(W+GAP)+k    *W/500,(int)(GAP+H/2+j*(H+GAP)-H/2*val/maxScale),
-										    GAP+i*(W+GAP)+(k+1)*W/500,(int)(GAP+H/2+j*(H+GAP)-H/2*val2/maxScale));
+								g2.drawLine(GAP+i*(W+GAP+GAP)+k    *W/500,(int)(GAP+H/2+j*(H+GAP)-H/2*val/maxScale),
+										    GAP+i*(W+GAP+GAP)+(k+1)*W/500,(int)(GAP+H/2+j*(H+GAP)-H/2*val2/maxScale));
 							}
 						}
 					}
 				}
 				
-				g2.drawString("Acc - X",GAP+5,GAP);
-				g2.drawString("Acc - Y",GAP+5,GAP+1*(H+GAP));
-				g2.drawString("Acc - Z",GAP+5,GAP+2*(H+GAP));
-				g2.drawString("Gyro - X",GAP+W+GAP+5,GAP);
-				g2.drawString("Gyro - Y",GAP+W+GAP+5,GAP+1*(H+GAP));
-				g2.drawString("Gyro - Z",GAP+W+GAP+5,GAP+2*(H+GAP));
+				g2.drawString("Acc - X",GAP+W/2,GAP);
+				g2.drawString("Acc - Y",GAP+W/2,GAP+1*(H+GAP));
+				g2.drawString("Acc - Z",GAP+W/2,GAP+2*(H+GAP));
+				g2.drawString("Gyro - X",GAP+W+GAP+GAP+W/2,GAP);
+				g2.drawString("Gyro - Y",GAP+W+GAP+GAP+W/2,GAP+1*(H+GAP));
+				g2.drawString("Gyro - Z",GAP+W+GAP+GAP+W/2,GAP+2*(H+GAP));
+				
+				g2.drawString("[m/s\u00B2]",GAP+5,GAP-5);
+				g2.drawString("[m/s\u00B2]",GAP+5,GAP+1*(H+GAP)-5);
+				g2.drawString("[m/s\u00B2]",GAP+5,GAP+2*(H+GAP)-5);
+				g2.drawString("[\u00B0/s]",GAP+W+GAP+5+GAP,GAP-5);
+				g2.drawString("[\u00B0/s]",GAP+W+GAP+5+GAP,GAP+1*(H+GAP)-5);
+				g2.drawString("[\u00B0/s]",GAP+W+GAP+5+GAP,GAP+2*(H+GAP)-5);
+				
+				g2.drawString("[s]", GAP+W+5, GAP+H/2+15);
+				g2.drawString("[s]", GAP+W+5, GAP+H/2+15+1*(H+GAP));
+				g2.drawString("[s]", GAP+W+5, GAP+H/2+15+2*(H+GAP));
+				g2.drawString("[s]", GAP+W+5+W+GAP+GAP, GAP+H/2+15);
+				g2.drawString("[s]", GAP+W+5+W+GAP+GAP, GAP+H/2+15+1*(H+GAP));
+				g2.drawString("[s]", GAP+W+5+W+GAP+GAP, GAP+H/2+15+2*(H+GAP));
 			}
 		};
 		panel.setPreferredSize(new Dimension(700,700)); //700*700
@@ -101,10 +115,10 @@ public class GUI implements DataObserver, UserInterface, EmergencyService {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		/*java.util.Timer t= new java.util.Timer();
-		t.scheduleAtFixedRate(new TimerTask(){
+		t.scheduleAtFixedRate(new java.util.TimerTask(){
 			@Override
 			public void run(){
-				Random rand = new Random(); 
+				java.util.Random rand = new java.util.Random(); 
 				newData(new MovementData((rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f,(rand.nextFloat()-0.5f)*2f));
 			}
 		}, (long)20,(long)20);*/
